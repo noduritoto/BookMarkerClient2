@@ -1,0 +1,5 @@
+include ':app', ':swipeMenuListViewLibrary', ':swipeMenuListViewDemo', ':tess-two'
+include ':Library:opencv'
+project(':swipeMenuListViewLibrary').projectDir = new File('Library/SwipeMenuListView/library')
+project(':swipeMenuListViewDemo').projectDir = new File('Library/SwipeMenuListView/demo')
+project(':tess-two').projectDir = new File('Library/tess-two')

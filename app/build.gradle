@@ -1,0 +1,85 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+//apply plugin: 'com.uphyca.android-aspectj'
+
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.example.leejunbeom.test"
+        minSdkVersion 19
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+        /*unitTests.all {
+            // All the usual Gradle options.
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen {false}
+                showStandardStreams = true
+            }
+        }*/
+    }
+
+    useLibrary 'org.apache.http.legacy'
+
+    lintOptions {
+        disable 'LongLogTag'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+configurations {
+    ajc
+    aspects
+    ajInpath
+}
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:support-annotations:23.2.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.google.dagger:dagger:2.0'
+    apt 'com.google.dagger:dagger-compiler:2.0'
+    provided 'javax.annotation:jsr250-api:1.0'
+    compile 'javax.inject:javax.inject:1'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile project(':Library:opencv')
+    compile 'com.loopj.android:android-async-http:1.4.9'
+    testCompile 'org.robolectric:robolectric:3.0'
+    compile 'org.json:json:20141113'
+    compile 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
+    compile 'com.google.zxing:core:3.2.1'
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    testCompile 'org.mockito:mockito-core:2.+'
+    testCompile 'com.google.dagger:dagger-compiler:2.0'
+    androidTestApt "com.google.dagger:dagger-compiler:2.0"
+    compile 'net.htmlparser.jericho:jericho-html:3.1'
+    compile 'io.reactivex:rxandroid:0.24.0'
+    compile project(':swipeMenuListViewLibrary')
+    compile 'org.mockito:mockito-core:2.+'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile project(':tess-two')
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+}

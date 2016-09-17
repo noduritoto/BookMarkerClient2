@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/BookMarkerClient.iml" filepath="$PROJECT_DIR$/BookMarkerClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Library/Library.iml" filepath="$PROJECT_DIR$/Library/Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Library/opencv/opencv.iml" filepath="$PROJECT_DIR$/Library/opencv/opencv.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Library/SwipeMenuListView/demo/swipeMenuListViewDemo.iml" filepath="$PROJECT_DIR$/Library/SwipeMenuListView/demo/swipeMenuListViewDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Library/SwipeMenuListView/library/swipeMenuListViewLibrary.iml" filepath="$PROJECT_DIR$/Library/SwipeMenuListView/library/swipeMenuListViewLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Library/tess-two/tess-two.iml" filepath="$PROJECT_DIR$/Library/tess-two/tess-two.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Library/tess-two/tess-two.iml" filepath="$PROJECT_DIR$/Library/tess-two/tess-two.iml" />
+    </modules>
+  </component>
+</project>
