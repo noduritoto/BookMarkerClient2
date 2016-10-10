@@ -98,8 +98,19 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         addlistener();
 
         if(mapDraw) {
+            //준범
+            /*
             libraryViewBitMap = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.non10);
             this.libraryView.setImageBitmap(rotateImage(libraryViewBitMap,90));
+            */
+
+            //영훈
+            Glide.with(mActivity).load(R.drawable.non10).asBitmap().into(new SimpleTarget<Bitmap>(500, 500) {
+                @Override
+                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    libraryView.setImageBitmap(rotateImage(resource, 90));
+                }
+            });
             mapDraw=false;
         }
     }
@@ -118,19 +129,35 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                 libraryViewBitMap=null;
 
                 spinnerPosition=position;
-                libraryViewBitMap = BitmapFactory.decodeResource(myResources, R.drawable.non10);
+                //libraryViewBitMap = BitmapFactory.decodeResource(myResources, R.drawable.non10); - 준범
                 if (position == 0) {
 
-                    libraryView.setImageBitmap(rotateImage(computedBitMap, 90));
+                    libraryView.setImageBitmap(rotateImage(computedBitMap, 90)); // 준범
                 } else {
+                    //computedBitMap.recycle();
+                    Log.i("noduri navi test 1. position test", Integer.toString(position) );
                     Book book=spinnerBookList.get(position);
                     int resourceId = myResources.getIdentifier(book.getBookShelf(), "drawable", myContext.getPackageName());
+                    //libraryViewBitMap = BitmapFactory.decodeResource(myResources, R.drawable.non10);
+                    Log.i("noduri navi test 2. resourceID test", Integer.toString(resourceId) );
+
                     Glide.with(mActivity).load(resourceId).asBitmap().into(new SimpleTarget<Bitmap>(500, 500) {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            libraryView.setImageBitmap(rotateImage(overlayMark(libraryViewBitMap,resource), 90));
+                            final Bitmap checkedBitmap = resource;
+                            Glide.with(mActivity).load(R.drawable.non10).asBitmap().into(new SimpleTarget<Bitmap>(500, 500) {
+                                @Override
+                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                    libraryView.setImageBitmap(rotateImage(overlayMark(resource, checkedBitmap), 90));
+                                }
+                            });
+
+                            //libraryView.setImageBitmap(rotateImage(overlayMark(libraryViewBitMap,resource), 90));
                         }
                     });
+
+
+                    //libraryView.setImageBitmap(rotateImage(overlayMark(libraryViewBitMap, checkedSection), 90));
                     //Bitmap bookBitMap=BitmapFactory.decodeResource(myResources, resourceId);
 
                 }
@@ -154,11 +181,15 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     @Override
     public void launchSearchActivity() {
 
+        Log.i("noduri launchSearchActivity", "");
+
         Book book=spinnerBookList.get(spinnerPosition);
+        Log.i("noduri feature url test ", book.getFeatureUrl() );
         if(book.getFeatureUrl()!=null) {
 
             Intent intent = new Intent(this, SearchActivity.class);
             intent.putExtra("imageURL", book.getFeatureUrl());
+
             startActivity(intent);
         }else{
             Toast.makeText(this,"책 이미지 등록이 안되있습니다",Toast.LENGTH_SHORT);
@@ -186,9 +217,28 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     @Override
     protected void onDestroy() {
+        Log.i("noduri", "onDestroy");
+        this.computedBitMap.recycle();
+        this.computedBitMap = null;
+        System.gc();
         super.onDestroy();
         this.libraryView.setImageBitmap(null);
     }
+
+    /*
+    @Override
+    public void onBackPressed(){
+
+        Log.i("noduri", "onBackPressed");
+        super.onBackPressed();
+        libraryViewBitMap.recycle();
+        computedBitMap.recycle();
+        libraryViewBitMap = null;
+        computedBitMap = null;
+        this.finish();
+
+    }
+    */
 
     @Subscribe
     public void onSetBookList(BookController bookController){
@@ -216,6 +266,34 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
             this.libraryView.setImageBitmap(rotateImage(computedBitMap,90));
         }
     }
+
+    public void noduriSetAllBookList(BookController bookController){
+
+        this.setSpinnerArrayList(bookController.getBookList());
+        this.spinnerAdapter.setBookData(spinnerBookList);
+        this.spinnerAdapter.notifyDataSetChanged();
+
+        if(mapDraw){
+            computedBitMap = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.non10);
+            this.libraryView.setImageBitmap(null);
+            this.libraryViewBitMap=null;
+            /*
+             포문 돌면서 이미지 중첩
+             */
+            for(int i=0;i<bookController.size();i++) {
+                Book book=bookController.getItem(i);
+                Resources resources = this.getResources();
+                int resourceId = resources.getIdentifier(book.getBookShelf(), "drawable", this.getPackageName());
+                Bitmap bookBitMap=BitmapFactory.decodeResource(resources, resourceId);
+                computedBitMap=this.overlayMark(computedBitMap,bookBitMap);
+            }
+            // 중첩된 이미지를 셋 한다.
+            mapDraw=false;
+            this.libraryView.setImageBitmap(rotateImage(computedBitMap,90));
+        }
+    }
+
+
 
     public ArrayList<Book> setSpinnerArrayList(ArrayList<Book> bookArrayList){
 
