@@ -1,6 +1,7 @@
 package com.example.leejunbeom.bookMarker.ui.activity;
 
 import android.content.Intent;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -78,6 +79,7 @@ public class BookAddActivity extends AppCompatActivity implements BookAddScreen{
 
     @OnClick(R.id.confirmButton)
     public void onCallBack(){
+        System.gc();
         bookAddPresenter.finishActivity(this);
     }
 

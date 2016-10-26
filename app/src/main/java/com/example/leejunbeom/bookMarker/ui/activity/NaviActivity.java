@@ -96,6 +96,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         spinnerPosition=0;
         spinner.setAdapter(spinnerAdapter);
         addlistener();
+        //mapDraw = true;
 
         if(mapDraw) {
             //준범
@@ -127,14 +128,17 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
                 libraryView.setImageBitmap(null);
                 libraryViewBitMap=null;
-
                 spinnerPosition=position;
+
                 //libraryViewBitMap = BitmapFactory.decodeResource(myResources, R.drawable.non10); - 준범
                 if (position == 0) {
-
+                    libraryView.invalidate();
+                    searchButton.setEnabled(false);
                     libraryView.setImageBitmap(rotateImage(computedBitMap, 90)); // 준범
                 } else {
                     //computedBitMap.recycle();
+                    libraryView.invalidate();
+                    searchButton.setEnabled(true);
                     Log.i("noduri navi test 1. position test", Integer.toString(position) );
                     Book book=spinnerBookList.get(position);
                     int resourceId = myResources.getIdentifier(book.getBookShelf(), "drawable", myContext.getPackageName());
@@ -200,6 +204,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     public void onResume() {
         super.onResume();
         mapDraw=true;
+        spinner.setSelection(0);
         naviPresenter.refreshListViewData();
 
     }
@@ -210,19 +215,39 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        super.onActivityResult(requestCode, resultCode, intent);
+        spinner.setSelection(0);
+    }
 
+    @Override
+    protected void onPause(){
+        libraryView.setImageBitmap(null);
+        computedBitMap.recycle();
+        computedBitMap = null;
+        System.gc();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+
+        super.onStop();
+        //computedBitMap.recycle();
+        //computedBitMap = null;
     }
 
     @Override
     protected void onDestroy() {
+
         Log.i("noduri", "onDestroy");
-        this.computedBitMap.recycle();
-        this.computedBitMap = null;
-        System.gc();
+        //this.computedBitMap.recycle();
+        //this.computedBitMap = null;
+        //System.gc();
+        //this.libraryView.setImageBitmap(null);
+        //this.libraryView.invalidate();
         super.onDestroy();
-        this.libraryView.setImageBitmap(null);
+
     }
 
     /*
@@ -242,32 +267,6 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     @Subscribe
     public void onSetBookList(BookController bookController){
-
-        this.setSpinnerArrayList(bookController.getBookList());
-        this.spinnerAdapter.setBookData(spinnerBookList);
-        this.spinnerAdapter.notifyDataSetChanged();
-
-        if(mapDraw){
-            computedBitMap = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.non10);
-            this.libraryView.setImageBitmap(null);
-            this.libraryViewBitMap=null;
-            /*
-             포문 돌면서 이미지 중첩
-             */
-            for(int i=0;i<bookController.size();i++) {
-                Book book=bookController.getItem(i);
-                Resources resources = this.getResources();
-                int resourceId = resources.getIdentifier(book.getBookShelf(), "drawable", this.getPackageName());
-                Bitmap bookBitMap=BitmapFactory.decodeResource(resources, resourceId);
-                computedBitMap=this.overlayMark(computedBitMap,bookBitMap);
-            }
-            // 중첩된 이미지를 셋 한다.
-            mapDraw=false;
-            this.libraryView.setImageBitmap(rotateImage(computedBitMap,90));
-        }
-    }
-
-    public void noduriSetAllBookList(BookController bookController){
 
         this.setSpinnerArrayList(bookController.getBookList());
         this.spinnerAdapter.setBookData(spinnerBookList);
