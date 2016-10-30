@@ -2,6 +2,7 @@ package com.example.leejunbeom.bookMarker.ui.activity;
 
 import android.content.Intent;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +44,7 @@ public class BookAddActivity extends AppCompatActivity implements BookAddScreen{
 
     @Bind(R.id.bookTitle)
     TextView bookTitieView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

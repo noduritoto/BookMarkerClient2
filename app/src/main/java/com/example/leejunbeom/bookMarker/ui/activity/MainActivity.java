@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements Mainscreen{
     @Override
     public void onResume() {
         super.onResume();
+        System.gc();
         mainPresenter.refreshListViewData();
     }
 

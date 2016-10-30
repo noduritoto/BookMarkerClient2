@@ -47,4 +47,9 @@ public class NaviPresenter_impl implements NaviPresenter{
     public BookController getBookController() {
         return bookController;
     }
+
+    @Override
+    public void onPathButtonClick(NaviScreen naviScreen){
+        naviScreen.launchPathActivity();
+    }
 }

@@ -9,4 +9,5 @@ import com.example.leejunbeom.bookMarker.ui.activity.SearchActivity;
  */
 public interface NaviScreen {
     void launchSearchActivity();
+    void launchPathActivity();
 }

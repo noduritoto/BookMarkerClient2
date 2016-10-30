@@ -36,6 +36,7 @@ import com.example.leejunbeom.test.R;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -58,6 +59,9 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     @Bind(R.id.naviButton)
     Button searchButton;
+
+    @Bind(R.id.pathButton)
+    Button pathButton;
 
     @Inject
     NaviPresenter naviPresenter;
@@ -116,10 +120,6 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         }
     }
 
-    public void setComputedImage(){
-        //spinnerBookList.add(0,spinnerBookList);
-    }
-
 
     private void addlistener() {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -134,11 +134,13 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                 if (position == 0) {
                     libraryView.invalidate();
                     searchButton.setEnabled(false);
+                    pathButton.setEnabled(false);
                     libraryView.setImageBitmap(rotateImage(computedBitMap, 90)); // 준범
                 } else {
                     //computedBitMap.recycle();
                     libraryView.invalidate();
                     searchButton.setEnabled(true);
+                    pathButton.setEnabled(true);
                     Log.i("noduri navi test 1. position test", Integer.toString(position) );
                     Book book=spinnerBookList.get(position);
                     int resourceId = myResources.getIdentifier(book.getBookShelf(), "drawable", myContext.getPackageName());
@@ -181,6 +183,9 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         naviPresenter.onBookSearchButtonClick(this);
     }
 
+    @OnClick(R.id.pathButton)
+    public void onPathButton(){ naviPresenter.onPathButtonClick(this); }
+
 
     @Override
     public void launchSearchActivity() {
@@ -201,17 +206,22 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     }
 
     @Override
+    public void launchPathActivity(){
+        Intent intent = new Intent(this, PathActivity.class);
+        //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        //computedBitMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        //byte[] byteArray = stream.toByteArray();
+        intent.putExtra("computedBitmap", computedBitMap);
+        startActivity(intent);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mapDraw=true;
         spinner.setSelection(0);
         naviPresenter.refreshListViewData();
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -222,48 +232,20 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     @Override
     protected void onPause(){
+        /*
         libraryView.setImageBitmap(null);
         computedBitMap.recycle();
         computedBitMap = null;
         System.gc();
+        */
         super.onPause();
     }
 
-    @Override
-    protected void onStop() {
-
-        super.onStop();
-        //computedBitMap.recycle();
-        //computedBitMap = null;
-    }
 
     @Override
     protected void onDestroy() {
-
-        Log.i("noduri", "onDestroy");
-        //this.computedBitMap.recycle();
-        //this.computedBitMap = null;
-        //System.gc();
-        //this.libraryView.setImageBitmap(null);
-        //this.libraryView.invalidate();
         super.onDestroy();
-
     }
-
-    /*
-    @Override
-    public void onBackPressed(){
-
-        Log.i("noduri", "onBackPressed");
-        super.onBackPressed();
-        libraryViewBitMap.recycle();
-        computedBitMap.recycle();
-        libraryViewBitMap = null;
-        computedBitMap = null;
-        this.finish();
-
-    }
-    */
 
     @Subscribe
     public void onSetBookList(BookController bookController){
@@ -273,7 +255,9 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         this.spinnerAdapter.notifyDataSetChanged();
 
         if(mapDraw){
-            computedBitMap = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.non10);
+            BitmapFactory.Options bitmapOption = new BitmapFactory.Options();
+            bitmapOption.inSampleSize = 2;
+            computedBitMap = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.non10, bitmapOption);
             this.libraryView.setImageBitmap(null);
             this.libraryViewBitMap=null;
             /*
@@ -283,7 +267,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                 Book book=bookController.getItem(i);
                 Resources resources = this.getResources();
                 int resourceId = resources.getIdentifier(book.getBookShelf(), "drawable", this.getPackageName());
-                Bitmap bookBitMap=BitmapFactory.decodeResource(resources, resourceId);
+                Bitmap bookBitMap=BitmapFactory.decodeResource(resources, resourceId, bitmapOption);
                 computedBitMap=this.overlayMark(computedBitMap,bookBitMap);
             }
             // 중첩된 이미지를 셋 한다.
