@@ -8,4 +8,5 @@ import com.example.leejunbeom.bookMarker.ui.screen_contracts.PathScreen;
 
 public interface PathPresenter {
     void finishActivity(PathScreen pathScreen);
+    void tryScan(PathScreen pathScreen);
 }

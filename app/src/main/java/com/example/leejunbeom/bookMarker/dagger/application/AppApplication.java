@@ -8,6 +8,7 @@ import com.example.leejunbeom.bookMarker.ui.activity.NaviActivity;
 import com.example.leejunbeom.bookMarker.ui.activity.MainActivity;
 import com.example.leejunbeom.bookMarker.ui.activity.PathActivity;
 import com.example.leejunbeom.bookMarker.ui.activity.SearchActivity;
+import com.example.leejunbeom.bookMarker.ui.activity.TableActivity;
 
 import javax.inject.Singleton;
 
@@ -26,6 +27,7 @@ public class AppApplication extends Application {
         void inject(NaviActivity naviActivity);
         void inject(SearchActivity searchActivity);
         void inject(PathActivity pathActivity);
+        void inject(TableActivity tableActivity);
     }
 
     private ApplicationComponent component;

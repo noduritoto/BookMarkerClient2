@@ -9,4 +9,5 @@ public interface Mainscreen {
     void launchAddBookActivity();
     void launchNaviActivity();
     void launchBookAddOCRActivity();
+    void launchTableSearchActity();
 }

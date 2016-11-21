@@ -47,7 +47,7 @@ public class MainActivityTest {
     public void setUp() {
         mainActivity = Robolectric.setupActivity(MainActivity.class);
         bookAddButton = (Button) mainActivity.findViewById(R.id.bookAddButton);
-        naviButton = (Button) mainActivity.findViewById(R.id.naviButton);
+        naviButton = (Button) mainActivity.findViewById(R.id.searchButton);
     }
 
     @After

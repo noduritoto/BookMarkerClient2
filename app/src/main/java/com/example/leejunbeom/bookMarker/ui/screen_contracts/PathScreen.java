@@ -6,4 +6,5 @@ package com.example.leejunbeom.bookMarker.ui.screen_contracts;
 
 public interface PathScreen {
     void finishPathActivity();
+    void tryScan();
 }

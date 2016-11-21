@@ -16,27 +16,22 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
-import com.example.leejunbeom.bookMarker.model.BitMapController;
 import com.example.leejunbeom.bookMarker.model.BookController;
 import com.example.leejunbeom.bookMarker.model.pojo.Book;
-import com.example.leejunbeom.bookMarker.ui.adapter.BookAdapter_impl;
 import com.example.leejunbeom.bookMarker.ui.adapter.SpinnerAdapter_impl;
 import com.example.leejunbeom.bookMarker.ui.presenter.NaviPresenter;
-import com.example.leejunbeom.bookMarker.ui.presenter.NaviPresenter_impl;
 import com.example.leejunbeom.bookMarker.ui.screen_contracts.NaviScreen;
 import com.example.leejunbeom.test.R;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -57,7 +52,7 @@ import butterknife.OnClick;
 
 public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
-    @Bind(R.id.naviButton)
+    @Bind(R.id.searchButton)
     Button searchButton;
 
     @Bind(R.id.pathButton)
@@ -69,7 +64,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     @Bind(R.id.libraryView)
     ImageView libraryView;
 
-    @Bind(R.id.spinner2)
+    @Bind(R.id.tableSpinner)
     Spinner spinner;
 
     private boolean mapDraw = true;
@@ -178,7 +173,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     }
 
-    @OnClick(R.id.naviButton)
+    @OnClick(R.id.searchButton)
     public void onSearchButton(){
         naviPresenter.onBookSearchButtonClick(this);
     }
@@ -211,7 +206,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         //ByteArrayOutputStream stream = new ByteArrayOutputStream();
         //computedBitMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         //byte[] byteArray = stream.toByteArray();
-        intent.putExtra("computedBitmap", computedBitMap);
+        //intent.putExtra("computedBitmap", computedBitMap);
         startActivity(intent);
     }
 
@@ -232,12 +227,12 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     @Override
     protected void onPause(){
-        /*
+
         libraryView.setImageBitmap(null);
         computedBitMap.recycle();
         computedBitMap = null;
         System.gc();
-        */
+
         super.onPause();
     }
 

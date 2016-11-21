@@ -3,12 +3,8 @@ package com.example.leejunbeom.bookMarker.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,7 +15,6 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.example.leejunbeom.bookMarker.SwipeMenuListView.SwipeMenuCreator_impl;
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
-import com.example.leejunbeom.bookMarker.model.BitMapController;
 import com.example.leejunbeom.bookMarker.model.BookController;
 import com.example.leejunbeom.bookMarker.model.pojo.Book;
 import com.example.leejunbeom.bookMarker.network.Network_impl;
@@ -36,11 +31,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 
 /**
@@ -63,11 +53,12 @@ public class MainActivity extends AppCompatActivity implements Mainscreen{
     @Bind(R.id.listView)
     SwipeMenuListView listView;
 
-    @Bind(R.id.naviButton)
+    @Bind(R.id.searchButton)
     Button searchButton;
 
-    @Bind(R.id.bookAddOCRButton)
-    Button ocrCameraButton;
+
+    @Bind(R.id.tableSearchButton)
+    Button searchTableButton;
 
     Context mainContext;
 
@@ -137,14 +128,14 @@ public class MainActivity extends AppCompatActivity implements Mainscreen{
         this.mainPresenter.onBookAddButtonClick(this);
     }
 
-    @OnClick(R.id.naviButton)
+    @OnClick(R.id.searchButton)
     public void onCallSearchButton(){
         this.mainPresenter.onSearchButtonClick(this);
     }
 
-    @OnClick(R.id.bookAddOCRButton)
-    public void onCallOCRCameraButton() {
-        this.mainPresenter.onBookAddOCRButtonClick(this);
+    @OnClick(R.id.tableSearchButton)
+    public void onTableSearchButtonClick() {
+        this.mainPresenter.onTableSearchButtonClick(this);
     }
 
     /**
@@ -171,6 +162,12 @@ public class MainActivity extends AppCompatActivity implements Mainscreen{
     @Override
     public void launchBookAddOCRActivity() {
         Intent intent = new Intent(this,TestActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void launchTableSearchActity(){
+        Intent intent = new Intent(this,TableActivity.class);
         startActivity(intent);
     }
 

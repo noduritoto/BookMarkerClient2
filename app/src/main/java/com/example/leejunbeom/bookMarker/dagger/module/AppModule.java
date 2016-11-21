@@ -16,6 +16,8 @@ import com.example.leejunbeom.bookMarker.ui.presenter.NaviPresenter;
 import com.example.leejunbeom.bookMarker.ui.presenter.NaviPresenter_impl;
 import com.example.leejunbeom.bookMarker.ui.presenter.PathPresenter;
 import com.example.leejunbeom.bookMarker.ui.presenter.PathPresenter_impl;
+import com.example.leejunbeom.bookMarker.ui.presenter.TablePresenter;
+import com.example.leejunbeom.bookMarker.ui.presenter.TablePresenter_impl;
 import com.example.leejunbeom.bookMarker.util.html.HtmlBookParser;
 import com.example.leejunbeom.bookMarker.util.html.HtmlParser;
 
@@ -101,4 +103,8 @@ public class AppModule {
     PathPresenter providePathPresenter(){
         return new PathPresenter_impl();
     }
+
+    @Provides
+    @Singleton
+    TablePresenter provideTablePresenter() { return new TablePresenter_impl(); }
 }

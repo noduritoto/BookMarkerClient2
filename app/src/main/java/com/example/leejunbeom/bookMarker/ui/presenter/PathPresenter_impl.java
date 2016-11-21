@@ -13,4 +13,9 @@ public class PathPresenter_impl implements PathPresenter{
     public void finishActivity(PathScreen pathScreen){
         pathScreen.finishPathActivity();
     }
+
+    @Override
+    public void tryScan(PathScreen pathScreen){
+        pathScreen.tryScan();
+    }
 }

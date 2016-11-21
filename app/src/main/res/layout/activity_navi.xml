@@ -7,8 +7,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
-            android:layout_above="@+id/naviButton"
-            android:layout_below="@+id/spinner2">
+            android:layout_above="@+id/searchButton"
+            android:layout_below="@+id/tableSpinner">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -24,14 +24,14 @@
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner2"
+        android:id="@+id/tableSpinner"
         android:spinnerMode="dropdown" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="찾기"
-        android:id="@+id/naviButton"
+        android:id="@+id/searchButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true" />
 

@@ -45,6 +45,11 @@ public class MainPresenter_impl implements MainPresenter {
         mainscreen.launchBookAddOCRActivity();
     }
 
+    @Override
+    public void onTableSearchButtonClick(Mainscreen mainscreen){
+        mainscreen.launchTableSearchActity();
+    }
+
     public BookController getBookController() {
         return bookController;
     }

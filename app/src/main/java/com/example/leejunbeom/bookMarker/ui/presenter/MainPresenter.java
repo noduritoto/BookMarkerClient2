@@ -14,4 +14,5 @@ public interface MainPresenter {
     void refreshListViewData();
     void onSearchButtonClick(Mainscreen mainscreen);
     void onBookAddOCRButtonClick(Mainscreen mainscreen);
+    void onTableSearchButtonClick(Mainscreen mainscreen);
 }
