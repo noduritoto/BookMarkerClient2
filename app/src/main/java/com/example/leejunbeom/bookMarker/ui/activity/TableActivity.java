@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
@@ -27,6 +29,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class TableActivity extends AppCompatActivity {
 
@@ -41,6 +44,9 @@ public class TableActivity extends AppCompatActivity {
 
     @Bind(R.id.webViewForTableSearch)
     WebView webViewForTableSearch;
+
+    @Bind(R.id.urlEditTextInTable)
+    EditText urlEditTextInTable;
 
     private TableSpinnerAdapter_impl tableSpinnerAdapter;
     int spinnerPosition;
@@ -67,12 +73,15 @@ public class TableActivity extends AppCompatActivity {
         addListener();
 
         //웹뷰관련
+        webViewForTableSearch.setWebViewClient(new WebViewClient());
         webViewForTableSearch.getSettings().setJavaScriptEnabled(true);
-        webViewForTableSearch.loadUrl("www.naver.com");
+        webViewForTableSearch.loadUrl("http://www.naver.com/");
+
         webViewForTableSearch.addJavascriptInterface(
                 new JavaScriptBridge_impl(new Handler()),
                 "Javascript for Table Search"
         );
+
     }
 
     // 스피너 리스너
@@ -97,7 +106,11 @@ public class TableActivity extends AppCompatActivity {
 
             }
         });
+    }
 
-
+    @OnClick(R.id.pathForTableButton)
+    public void onURLButtonClick(){
+        //webViewForTableSearch.loadUrl(urlEditText.getText().toString());
+        webViewForTableSearch.loadUrl("http://" + urlEditTextInTable.getText().toString() + "/");
     }
 }

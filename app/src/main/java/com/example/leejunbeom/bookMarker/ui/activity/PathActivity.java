@@ -20,7 +20,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
-import com.example.leejunbeom.bookMarker.model.LibraryMap;
 import com.example.leejunbeom.bookMarker.ui.presenter.PathPresenter;
 import com.example.leejunbeom.bookMarker.ui.screen_contracts.PathScreen;
 import com.example.leejunbeom.test.R;
@@ -56,7 +55,6 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
     private FileOutputStream fos;
 
 
-    private LibraryMap libraryMap;
     private List<String> optimalPath;
 
 

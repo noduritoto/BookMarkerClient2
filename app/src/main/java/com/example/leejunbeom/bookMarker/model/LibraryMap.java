@@ -2,17 +2,21 @@ package com.example.leejunbeom.bookMarker.model;
 
 import java.util.List;
 
-/**
- * Created by noduritoto on 2016. 11. 14..
- */
 
+
+/*
 public class LibraryMap {
-    /*
-    MapGraph libraryMapGraph;
+
+    MapGraph libraryMapGraph = new MapGraph();
     List<String> optimalPath;
 
     public List getOptimalPath(String start, String end){
-        return libraryMapGraph.calculateShortestPath(start, end);
+        this.optimalPath = libraryMapGraph.calculateShortestPath(start, end);
+        return this.optimalPath;
+    }
+    public String getOptimalPath1(String start, String end){
+        this.optimalPath = libraryMapGraph.calculateShortestPath(start, end);
+        return this.optimalPath.toString();
     }
 
 }
@@ -56,6 +60,20 @@ class MapGraph {
         System.out.println(Hipster.createAStar(p).search(destination));
         optimalPath = Hipster.createAStar(p).search(destination).getOptimalPaths();
         return optimalPath;
+    }
+
+    public String calculateShortestPath1(String start, String destination){
+
+        SearchProblem p = GraphSearchProblem
+                .startingFrom(start)
+                .in(graph)
+                .takeCostsFromEdges()
+                .build();
+
+        // Search the shortest path from "start" to "destination"
+        System.out.println(Hipster.createAStar(p).search(destination));
+        //optimalPath = Hipster.createAStar(p).search(destination).getOptimalPaths();
+        return Hipster.createAStar(p).search(destination).toString();
     }
 }
 
@@ -102,5 +120,4 @@ class MapSpot{
 
 /////////////////////////////////////////////////////////////////////
 
-    */
-}
+*/

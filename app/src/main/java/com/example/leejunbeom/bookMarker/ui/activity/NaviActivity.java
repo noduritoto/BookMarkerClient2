@@ -9,11 +9,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -24,6 +28,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
 import com.example.leejunbeom.bookMarker.model.BookController;
 import com.example.leejunbeom.bookMarker.model.pojo.Book;
+import com.example.leejunbeom.bookMarker.network.javaScriptBridge.JavaScriptBridge_impl;
 import com.example.leejunbeom.bookMarker.ui.adapter.SpinnerAdapter_impl;
 import com.example.leejunbeom.bookMarker.ui.presenter.NaviPresenter;
 import com.example.leejunbeom.bookMarker.ui.screen_contracts.NaviScreen;
@@ -67,6 +72,12 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     @Bind(R.id.tableSpinner)
     Spinner spinner;
 
+    @Bind(R.id.webViewForBookFind)
+    WebView webViewForBookFind;
+
+    @Bind(R.id.urlEditTextInNavi)
+    EditText urlEditTextInNavi;
+
     private boolean mapDraw = true;
     private Bitmap libraryViewBitMap;
     private Bitmap computedBitMap;
@@ -108,11 +119,22 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
             Glide.with(mActivity).load(R.drawable.non10).asBitmap().into(new SimpleTarget<Bitmap>(500, 500) {
                 @Override
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    libraryView.setImageBitmap(rotateImage(resource, 90));
+                    //libraryView.setImageBitmap(rotateImage(resource, 90));
+                    //훈의 주석처리
                 }
             });
             mapDraw=false;
         }
+
+        //웹뷰관련
+        webViewForBookFind.setWebViewClient(new WebViewClient());
+        webViewForBookFind.getSettings().setJavaScriptEnabled(true);
+        webViewForBookFind.loadUrl("http://www.naver.com/");
+        webViewForBookFind.addJavascriptInterface(
+                new JavaScriptBridge_impl(new Handler()),
+                "Javascript for Book Search"
+        );
+
     }
 
 
@@ -130,7 +152,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                     libraryView.invalidate();
                     searchButton.setEnabled(false);
                     pathButton.setEnabled(false);
-                    libraryView.setImageBitmap(rotateImage(computedBitMap, 90)); // 준범
+                    //libraryView.setImageBitmap(rotateImage(computedBitMap, 90)); // 준범, 훈의 주석처리
                 } else {
                     //computedBitMap.recycle();
                     libraryView.invalidate();
@@ -149,7 +171,8 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                             Glide.with(mActivity).load(R.drawable.non10).asBitmap().into(new SimpleTarget<Bitmap>(500, 500) {
                                 @Override
                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                    libraryView.setImageBitmap(rotateImage(overlayMark(resource, checkedBitmap), 90));
+                                    //libraryView.setImageBitmap(rotateImage(overlayMark(resource, checkedBitmap), 90));
+                                    //훈의 주석처리
                                 }
                             });
 
@@ -202,12 +225,11 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     @Override
     public void launchPathActivity(){
+        /*
         Intent intent = new Intent(this, PathActivity.class);
-        //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        //computedBitMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        //byte[] byteArray = stream.toByteArray();
-        //intent.putExtra("computedBitmap", computedBitMap);
         startActivity(intent);
+        */
+        webViewForBookFind.loadUrl("http://" + urlEditTextInNavi.getText().toString() + "/");
     }
 
     @Override
@@ -267,7 +289,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
             }
             // 중첩된 이미지를 셋 한다.
             mapDraw=false;
-            this.libraryView.setImageBitmap(rotateImage(computedBitMap,90));
+            //this.libraryView.setImageBitmap(rotateImage(computedBitMap,90));
         }
     }
 
