@@ -23,6 +23,7 @@ public class Book {
     private String mark;
     private String bookShelf;
     private String imageURL;
+    private String bookShelfNumber;
 
     public Book(){
 
@@ -34,6 +35,7 @@ public class Book {
         this.author = jsonBookObject.getString("author");
         this.mark = jsonBookObject.getString("mark");
         this.bookShelf = prefix+jsonBookObject.getString("bookshelf");
+        this.bookShelfNumber = jsonBookObject.getString("bookshelf");
     }
 
     public String getAuthor() {
@@ -74,6 +76,10 @@ public class Book {
 
     public void setBookShelf(String bookShelf) {
         this.bookShelf = bookShelf;
+    }
+
+    public String getBookShelfNumber(){
+        return this.bookShelfNumber;
     }
 
     @Override

@@ -1,9 +1,11 @@
 package com.example.leejunbeom.bookMarker.dagger.module;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
 import com.example.leejunbeom.bookMarker.model.BitMapController;
+import com.example.leejunbeom.bookMarker.model.IPS.APInfo.APInfo;
 import com.example.leejunbeom.bookMarker.model.PostApi;
 import com.example.leejunbeom.bookMarker.network.jericho.Jericho;
 import com.example.leejunbeom.bookMarker.model.BookController;
@@ -107,4 +109,10 @@ public class AppModule {
     @Provides
     @Singleton
     TablePresenter provideTablePresenter() { return new TablePresenter_impl(); }
+
+    @Provides
+    @Singleton
+    APInfo provideAPInfo(){
+        return new APInfo(context.getResources());
+    }
 }

@@ -5,4 +5,5 @@ package com.example.leejunbeom.bookMarker.ui.screen_contracts;
  */
 
 public interface TableScreen {
+    void tryFindTable();
 }

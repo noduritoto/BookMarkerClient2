@@ -5,27 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
+import com.example.leejunbeom.bookMarker.model.IPS.APInfo.APInfo;
 import com.example.leejunbeom.bookMarker.ui.presenter.PathPresenter;
 import com.example.leejunbeom.bookMarker.ui.screen_contracts.PathScreen;
 import com.example.leejunbeom.test.R;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +35,7 @@ import butterknife.OnClick;
 public class PathActivity extends AppCompatActivity implements PathScreen {
 
     @Inject PathPresenter pathPresenter;
+    @Inject APInfo apInfo1;
 
     @Bind(R.id.pathOKButton) Button pathOKButton;
     @Bind(R.id.tryScanButton) Button tryScanButton;
@@ -57,6 +53,8 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
 
     private List<String> optimalPath;
 
+    private APInfo apInfo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +64,9 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
         ((AppApplication) getApplication()).component().inject(this); // for dagger
         ButterKnife.bind(this); // for butterknife
 
-        //byte[] arr = getIntent().getByteArrayExtra("image");
-        //myBM =getIntent().getParcelableExtra("computedBitmap");
-        //pathView.setImageBitmap(myBM);
+        // 화면 안꺼지게
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        /////
 
         MAClist = new ArrayList<String>();
         // 와이파이 부분
@@ -78,13 +76,6 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
         scanResult.setText("Scan Start\n");
         scanResult.append("GO GO");
 
-        /*
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        registerReceiver(wifiReceiver, filter);
-        wm.startScan();
-        */
 
     }
 
@@ -120,6 +111,8 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
                     }
                     */
                 }
+                wm.startScan();
+                /*
 
                 if (count == 10) {
                     scanResult.setText(" == Complete ==\n" + scanResult.getText());
@@ -128,6 +121,7 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
                 }
 
                 else wm.startScan();
+                */
 
             } else if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
                 sendBroadcast(new Intent("wifi.ON_NETWORK_STATE_CHANGED"));
@@ -165,10 +159,6 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
             System.out.println(data);
         }
         */
-
-
-
-
     }
 
     @OnClick(R.id.pathOKButton)
@@ -179,7 +169,9 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
 
     @OnClick(R.id.tryScanButton)
     public void onTryScanButtonClick(){
-        pathPresenter.tryScan(this);
+        //pathPresenter.tryScan(this);
+        //apInfo = new APInfo(getResources());
+        scanResult.setText(apInfo1.getMAClist().get(2).toString());
     }
 
     /*
@@ -197,32 +189,6 @@ public class PathActivity extends AppCompatActivity implements PathScreen {
 
 
     //////////////////////////////////////////////////////////////////
-
-
-
-    /// 와이파이 신호 관련한 백그라운드
-
-    /*
-
-
-    private class PathAsyncTask extends AsyncTask<Void, Void, Void>{
-
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void doInBackground(Void... p){
-            super.doInBackground();
-        }
-
-        @Override
-        protected void onPostExecute(){
-            super.onPostExecute();
-        }
-    }
-    */
 
 
 }

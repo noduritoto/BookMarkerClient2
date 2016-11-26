@@ -1,18 +1,23 @@
 package com.example.leejunbeom.bookMarker.ui.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -27,8 +32,9 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
 import com.example.leejunbeom.bookMarker.model.BookController;
+import com.example.leejunbeom.bookMarker.model.IPS.APInfo.APInfo;
 import com.example.leejunbeom.bookMarker.model.pojo.Book;
-import com.example.leejunbeom.bookMarker.network.javaScriptBridge.JavaScriptBridge_impl;
+import com.example.leejunbeom.bookMarker.model.IPS.javaScriptBridge.JavaScriptBridge_impl;
 import com.example.leejunbeom.bookMarker.ui.adapter.SpinnerAdapter_impl;
 import com.example.leejunbeom.bookMarker.ui.presenter.NaviPresenter;
 import com.example.leejunbeom.bookMarker.ui.screen_contracts.NaviScreen;
@@ -38,6 +44,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -87,6 +94,12 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     private Resources myResources;
     private int spinnerPosition;
     private Activity mActivity;
+    private ArrayList<String> MAClist;
+    private APInfo apInfo;
+
+
+    private WifiManager wm;
+    private List<ScanResult> scanDatas;
 
     //// TODO: 16. 4. 18.
     @Override
@@ -96,16 +109,46 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         ((AppApplication) getApplication()).component().inject(this);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
+        naviPresenter.refreshListViewData();
+
+        //화면 안꺼지게
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        ///
+
 
         this.mActivity = this;
         this.myContext=this.getApplicationContext();
         this.myResources=this.getResources();
-        spinnerAdapter = new SpinnerAdapter_impl(this.getApplicationContext());
+
+
+        //웹뷰관련
+        webViewForBookFind.setWebViewClient(new WebViewClient(){
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // 자바스크립트 연동 부분 = ALL
+                //Toast.makeText(myContext, "북리스트 갯수 : " + spinnerBookList.size(), Toast.LENGTH_SHORT).show();
+                for(Book book :spinnerBookList){
+                    webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
+                }
+
+            }
+        });
+        webViewForBookFind.getSettings().setJavaScriptEnabled(true);
+        webViewForBookFind.loadUrl("http://52.79.133.224/location/map/");
+        webViewForBookFind.addJavascriptInterface(
+                new JavaScriptBridge_impl(new Handler()),
+                "Javascript for Book Search"
+        );
+
+        // 스피너 관련
+       spinnerAdapter = new SpinnerAdapter_impl(this.getApplicationContext());
         //spinnerAdapter.setBookData(spinnerBookList);
         //spinnerAdapter.notifyDataSetChanged();
         spinnerPosition=0;
         spinner.setAdapter(spinnerAdapter);
         addlistener();
+        spinner.setSelection(0);
         //mapDraw = true;
 
         if(mapDraw) {
@@ -126,19 +169,21 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
             mapDraw=false;
         }
 
-        //웹뷰관련
-        webViewForBookFind.setWebViewClient(new WebViewClient());
-        webViewForBookFind.getSettings().setJavaScriptEnabled(true);
-        webViewForBookFind.loadUrl("http://www.naver.com/");
-        webViewForBookFind.addJavascriptInterface(
-                new JavaScriptBridge_impl(new Handler()),
-                "Javascript for Book Search"
-        );
+
+
+        //와이파이 관련
+        apInfo = new APInfo(getResources());
+        this.MAClist = apInfo.getMAClist();
+
+        wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if(!wm.isWifiEnabled()) wm.setWifiEnabled(true);
+        tryScan();
+
 
     }
 
-
     private void addlistener() {
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -147,12 +192,21 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                 libraryViewBitMap=null;
                 spinnerPosition=position;
 
+
                 //libraryViewBitMap = BitmapFactory.decodeResource(myResources, R.drawable.non10); - 준범
                 if (position == 0) {
                     libraryView.invalidate();
                     searchButton.setEnabled(false);
                     pathButton.setEnabled(false);
                     //libraryView.setImageBitmap(rotateImage(computedBitMap, 90)); // 준범, 훈의 주석처리
+
+                    // 자바스크립트 연동 부분 = ALL
+                    webViewForBookFind.loadUrl("javascript:clear()");
+                    webViewForBookFind.loadUrl("javascript:hideshelf()");
+                    for(Book book :spinnerBookList){
+                        webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
+                    }
+
                 } else {
                     //computedBitMap.recycle();
                     libraryView.invalidate();
@@ -184,15 +238,27 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                     //libraryView.setImageBitmap(rotateImage(overlayMark(libraryViewBitMap, checkedSection), 90));
                     //Bitmap bookBitMap=BitmapFactory.decodeResource(myResources, resourceId);
 
+                    //자바스크립트 연동부분
+                    Toast.makeText(myContext, book.getBookShelfNumber(), Toast.LENGTH_SHORT).show();
+                    System.out.println(book.getBookShelf());
+                    webViewForBookFind.loadUrl("javascript:hideshelf()");
+                    webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
+                    webViewForBookFind.loadUrl("javascript:setshelf('" + book.getBookShelfNumber() + "')");
+
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                // 자바스크립트 연동 부분 = ALL
+                webViewForBookFind.loadUrl("javascript:clear()");
+                webViewForBookFind.loadUrl("javascript:hideshelf()");
+                Toast.makeText(myContext, "북리스트 갯수 : " + spinnerBookList.size(), Toast.LENGTH_SHORT);
+                for(Book book :spinnerBookList){
+                    webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
+                }
             }
         });
-
 
     }
 
@@ -225,11 +291,11 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
     @Override
     public void launchPathActivity(){
-        /*
+
         Intent intent = new Intent(this, PathActivity.class);
         startActivity(intent);
-        */
-        webViewForBookFind.loadUrl("http://" + urlEditTextInNavi.getText().toString() + "/");
+
+        //webViewForBookFind.loadUrl("http://" + urlEditTextInNavi.getText().toString() + "/");
     }
 
     @Override
@@ -238,6 +304,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         mapDraw=true;
         spinner.setSelection(0);
         naviPresenter.refreshListViewData();
+
 
     }
 
@@ -271,6 +338,8 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         this.spinnerAdapter.setBookData(spinnerBookList);
         this.spinnerAdapter.notifyDataSetChanged();
 
+
+
         if(mapDraw){
             BitmapFactory.Options bitmapOption = new BitmapFactory.Options();
             bitmapOption.inSampleSize = 2;
@@ -291,6 +360,22 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
             mapDraw=false;
             //this.libraryView.setImageBitmap(rotateImage(computedBitMap,90));
         }
+
+        // 자바스크립트 연동 부분 = ALL
+        webViewForBookFind.loadUrl("javascript:clear()");
+        webViewForBookFind.loadUrl("javascript:hideshelf()");
+        for(Book book :spinnerBookList){
+            webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
+        }
+
+        // 자바스크립트 연동 부분 = ALL
+        webViewForBookFind.loadUrl("javascript:clear()");
+        webViewForBookFind.loadUrl("javascript:hideshelf()");
+        Toast.makeText(myContext, "북리스트 갯수 : " + spinnerBookList.size(), Toast.LENGTH_SHORT);
+        for(Book book :spinnerBookList){
+            webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
+        }
+
     }
 
 
@@ -336,6 +421,71 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                 src.getHeight(), matrix, true);
     }
 
+    // 와이파이 스캔 리스너
+    // 와이파이 리시버
+    private BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            ArrayList<Integer> SIGlist = new ArrayList<>(MAClist.size());
+            int[] signalList = new int[183];
+            String temp;
+            if(action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+                //signal List 초기화
+                for(int i : signalList){
+                    signalList[i] = -130;
+                }
+                for(int i : SIGlist){
+                    SIGlist.set(i, -130);
+                }
+                scanDatas = wm.getScanResults();
+                if (scanDatas.size() == 0) {
+                    Toast.makeText(myContext, "result size : 0", Toast.LENGTH_SHORT);
+                    //scanResult.setText("size : 0");
+                }
+                else {
+                    for (ScanResult result : scanDatas) {
+                        //if(result.SSID.equals("youngsu")) {
+                        if (MAClist.contains(result.BSSID) ) {
+                            SIGlist.clear();
+                            SIGlist.set(MAClist.indexOf(result.BSSID), result.level);
+                            //signalList[MAClist.indexOf(result.BSSID)] = result.level;
+                        }
+                    }
+                    //던져주기
+                    String listString = "";
+                    for (int i : SIGlist)
+                    {
+                        listString += String.valueOf(i) + "@";
+                    }
+                    //Toast.makeText(myContext, String.valueOf(signalList[0]), Toast.LENGTH_SHORT).show();
+                    //Log.i("noduritoto ap", "apList to String :" + String.valueOf(SIGlist.get(0).toString()));
+                    webViewForBookFind.loadUrl("javascript:setlocation('kkkkkk')");
+                }
+                wm.startScan();
+
+            } else if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                sendBroadcast(new Intent("wifi.ON_NETWORK_STATE_CHANGED"));
+            }
+        }
+    };
+
+
+    public void tryScan(){
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceiver, filter);
+        wm.startScan();
+
+    }
+
+    public void arrayListToString(ArrayList<Integer> sigList){
+        for (int sig : sigList) {
+            sig = -130;
+        }
+    }
     //test
     public Button getSearchButton() {
         return searchButton;
@@ -345,4 +495,5 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     public NaviPresenter getNaviPresenter() {
         return naviPresenter;
     }
+
 }

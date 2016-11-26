@@ -23,6 +23,9 @@ public class SpinnerAdapter_impl extends BaseAdapter {
     public SpinnerAdapter_impl(Context applicationContext) {
         this.mContext=applicationContext;
     }
+    public SpinnerAdapter_impl(Context applicationContext, ArrayList<Book> bookArrayList) {
+        this.mContext=applicationContext;
+    }
 
     public void setBookData(ArrayList<Book> listBook){
         this.listBook=listBook;
