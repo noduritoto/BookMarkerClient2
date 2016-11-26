@@ -41,12 +41,16 @@ public class WifiBroadCastReciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
-        ArrayList<Integer> SIGlist = new ArrayList<Integer>(MAClist.size());
-        String temp;
-        for (int sig : SIGlist) {
-            sig = -130;
-        }
+        ArrayList<Integer> SIGlist = new ArrayList<>(MAClist.size());
+        int[] signalList = new int[183];
         if(action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+            //signal List 초기화
+            for(int i : signalList){
+                signalList[i] = -130;
+            }
+            for(int i : SIGlist){
+                SIGlist.set(i, -130);
+            }
             scanDatas = wm.getScanResults();
             if (scanDatas.size() == 0) {
                 //Toast.makeText(myContext, "Size : 0", Toast.LENGTH_SHORT);
@@ -60,7 +64,14 @@ public class WifiBroadCastReciever extends BroadcastReceiver {
                     }
                 }
                 //던져주기
-                this.mWebView.loadUrl("javascript:hideshelf()");
+                String listString = "";
+                for (int i : SIGlist)
+                {
+                    listString += String.valueOf(i) + "@";
+                }
+                //Toast.makeText(myContext, String.valueOf(signalList[0]), Toast.LENGTH_SHORT).show();
+                //Log.i("noduritoto ap", "apList to String :" + String.valueOf(SIGlist.get(0).toString()));
+                mWebView.loadUrl("javascript:setlocation('kkkkkk')");
             }
             wm.startScan();
 

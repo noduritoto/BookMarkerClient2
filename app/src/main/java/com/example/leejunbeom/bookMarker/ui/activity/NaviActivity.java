@@ -250,13 +250,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // 자바스크립트 연동 부분 = ALL
-                webViewForBookFind.loadUrl("javascript:clear()");
-                webViewForBookFind.loadUrl("javascript:hideshelf()");
-                Toast.makeText(myContext, "북리스트 갯수 : " + spinnerBookList.size(), Toast.LENGTH_SHORT);
-                for(Book book :spinnerBookList){
-                    webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
-                }
+
             }
         });
 
@@ -360,22 +354,6 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
             mapDraw=false;
             //this.libraryView.setImageBitmap(rotateImage(computedBitMap,90));
         }
-
-        // 자바스크립트 연동 부분 = ALL
-        webViewForBookFind.loadUrl("javascript:clear()");
-        webViewForBookFind.loadUrl("javascript:hideshelf()");
-        for(Book book :spinnerBookList){
-            webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
-        }
-
-        // 자바스크립트 연동 부분 = ALL
-        webViewForBookFind.loadUrl("javascript:clear()");
-        webViewForBookFind.loadUrl("javascript:hideshelf()");
-        Toast.makeText(myContext, "북리스트 갯수 : " + spinnerBookList.size(), Toast.LENGTH_SHORT);
-        for(Book book :spinnerBookList){
-            webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
-        }
-
     }
 
 

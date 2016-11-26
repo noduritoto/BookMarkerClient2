@@ -1,5 +1,11 @@
 package com.example.leejunbeom.bookMarker.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,10 +16,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.leejunbeom.bookMarker.dagger.application.AppApplication;
+import com.example.leejunbeom.bookMarker.model.IPS.APInfo.APInfo;
 import com.example.leejunbeom.bookMarker.model.IPS.javaScriptBridge.JavaScriptBridge_impl;
 import com.example.leejunbeom.bookMarker.ui.presenter.TablePresenter;
 import com.example.leejunbeom.bookMarker.ui.screen_contracts.TableScreen;
 import com.example.leejunbeom.test.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -40,12 +50,20 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
     @Bind(R.id.tableNumEditText)
     EditText tableNumEditText;
 
+
+    private ArrayList<String> MAClist;
+    private APInfo apInfo;
+    private WifiManager wm;
+    private List<ScanResult> scanDatas;
+    private Context myContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_table);
         ((AppApplication) getApplication()).component().inject(this);
         ButterKnife.bind(this);
+        this.myContext=this.getApplicationContext();
 
         /*
         // 이미지관련
@@ -72,6 +90,11 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
                 "Javascript for Table Search"
         );
 
+        //와이파이 관련
+        apInfo = new APInfo(getResources());
+        this.MAClist = apInfo.getMAClist();
+        wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if(!wm.isWifiEnabled()) wm.setWifiEnabled(true);
 
     }
 
@@ -106,7 +129,12 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
     @Override
     public void tryFindTable(){
         checkTableNum(new Integer(tableNumEditText.getText().toString()));
-        webViewForTableSearch.loadUrl("javascript:setseat('" + tableNumEditText.getText().toString() + "')");
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceiver, filter);
+        wm.startScan();
+        //webViewForTableSearch.loadUrl("javascript:setseat('" + tableNumEditText.getText().toString() + "')");
     }
 
     public void checkTableNum(int tableNum){
@@ -117,6 +145,65 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
             Toast.makeText(this, "테이블 번호를 잘못 입력하셨습니다. (1~312)", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void tryScan(){
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceiver, filter);
+        wm.startScan();
+
+    }
+
+    // 와이파이 스캔 리스너
+    // 와이파이 리시버
+    private BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            ArrayList<Integer> SIGlist = new ArrayList<>(MAClist.size());
+            int[] signalList = new int[183];
+            String temp;
+            if(action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+                //signal List 초기화
+                for(int i : signalList){
+                    signalList[i] = -130;
+                }
+                for(int i : SIGlist){
+                    SIGlist.set(i, -130);
+                }
+                scanDatas = wm.getScanResults();
+                if (scanDatas.size() == 0) {
+                    Toast.makeText(myContext, "result size : 0", Toast.LENGTH_SHORT);
+                    //scanResult.setText("size : 0");
+                }
+                else {
+                    for (ScanResult result : scanDatas) {
+                        //if(result.SSID.equals("youngsu")) {
+                        if (MAClist.contains(result.BSSID) ) {
+                            SIGlist.clear();
+                            SIGlist.set(MAClist.indexOf(result.BSSID), result.level);
+                            //signalList[MAClist.indexOf(result.BSSID)] = result.level;
+                        }
+                    }
+                    //던져주기
+                    String listString = "";
+                    for (int i : SIGlist)
+                    {
+                        listString += String.valueOf(i) + "@";
+                    }
+                    //Toast.makeText(myContext, String.valueOf(signalList[0]), Toast.LENGTH_SHORT).show();
+                    //Log.i("noduritoto ap", "apList to String :" + String.valueOf(SIGlist.get(0).toString()));
+                    webViewForTableSearch.loadUrl("javascript:setseat('" + tableNumEditText.getText().toString() + "')");
+                }
+                wm.startScan();
+
+            } else if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                sendBroadcast(new Intent("wifi.ON_NETWORK_STATE_CHANGED"));
+            }
+        }
+    };
 
 
     @OnClick(R.id.pathForTableButton)
