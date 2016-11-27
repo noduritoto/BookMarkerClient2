@@ -406,15 +406,11 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             ArrayList<Integer> SIGlist = new ArrayList<>(MAClist.size());
-            int[] signalList = new int[183];
-            String temp;
+            int[] signalList = new int[184];
             if(action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
                 //signal List 초기화
-                for(int i : signalList){
+                for(int i=0; i<184; i++){
                     signalList[i] = -130;
-                }
-                for(int i : SIGlist){
-                    SIGlist.set(i, -130);
                 }
                 scanDatas = wm.getScanResults();
                 if (scanDatas.size() == 0) {
@@ -425,20 +421,26 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                     for (ScanResult result : scanDatas) {
                         //if(result.SSID.equals("youngsu")) {
                         if (MAClist.contains(result.BSSID) ) {
-                            SIGlist.clear();
-                            SIGlist.set(MAClist.indexOf(result.BSSID), result.level);
-                            //signalList[MAClist.indexOf(result.BSSID)] = result.level;
+                            //SIGlist.clear();
+                            //SIGlist.set(MAClist.indexOf(result.BSSID), result.level);
+                            signalList[MAClist.indexOf(result.BSSID)] = result.level;
                         }
                     }
                     //던져주기
                     String listString = "";
-                    for (int i : SIGlist)
+                    for (int i=0; i<184; i++)
                     {
-                        listString += String.valueOf(i) + "@";
+                        if(i==183) {
+                            listString += String.valueOf(signalList[i]);
+                        }
+                        else{
+                            listString += String.valueOf(signalList[i]) + "@";
+                        }
+
                     }
-                    //Toast.makeText(myContext, String.valueOf(signalList[0]), Toast.LENGTH_SHORT).show();
-                    //Log.i("noduritoto ap", "apList to String :" + String.valueOf(SIGlist.get(0).toString()));
-                    webViewForBookFind.loadUrl("javascript:setlocation('kkkkkk')");
+                    //Toast.makeText(myContext, "-130", Toast.LENGTH_SHORT).show();
+                    Log.i("noduritoto ap", "apList to String :" + listString);
+                    webViewForBookFind.loadUrl("javascript:setlocation('" + listString + "')");
                 }
                 wm.startScan();
 

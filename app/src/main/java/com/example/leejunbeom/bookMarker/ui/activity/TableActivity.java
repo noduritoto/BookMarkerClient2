@@ -9,6 +9,7 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -96,6 +97,8 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
         wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         if(!wm.isWifiEnabled()) wm.setWifiEnabled(true);
 
+        tryFindTable();
+
     }
 
 
@@ -128,7 +131,6 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
     */
     @Override
     public void tryFindTable(){
-        checkTableNum(new Integer(tableNumEditText.getText().toString()));
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
@@ -163,15 +165,11 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             ArrayList<Integer> SIGlist = new ArrayList<>(MAClist.size());
-            int[] signalList = new int[183];
-            String temp;
+            int[] signalList = new int[184];
             if(action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
                 //signal List 초기화
-                for(int i : signalList){
+                for(int i=0; i<184; i++){
                     signalList[i] = -130;
-                }
-                for(int i : SIGlist){
-                    SIGlist.set(i, -130);
                 }
                 scanDatas = wm.getScanResults();
                 if (scanDatas.size() == 0) {
@@ -182,20 +180,25 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
                     for (ScanResult result : scanDatas) {
                         //if(result.SSID.equals("youngsu")) {
                         if (MAClist.contains(result.BSSID) ) {
-                            SIGlist.clear();
-                            SIGlist.set(MAClist.indexOf(result.BSSID), result.level);
-                            //signalList[MAClist.indexOf(result.BSSID)] = result.level;
+                            signalList[MAClist.indexOf(result.BSSID)] = result.level;
                         }
                     }
                     //던져주기
                     String listString = "";
-                    for (int i : SIGlist)
+                    for (int i=0; i<184; i++)
                     {
-                        listString += String.valueOf(i) + "@";
+                        if(i==183) {
+                            listString += String.valueOf(signalList[i]);
+                        }
+                        else{
+                            listString += String.valueOf(signalList[i]) + "@";
+                        }
+
                     }
-                    //Toast.makeText(myContext, String.valueOf(signalList[0]), Toast.LENGTH_SHORT).show();
-                    //Log.i("noduritoto ap", "apList to String :" + String.valueOf(SIGlist.get(0).toString()));
-                    webViewForTableSearch.loadUrl("javascript:setseat('" + tableNumEditText.getText().toString() + "')");
+                    //Toast.makeText(myContext, "-130", Toast.LENGTH_SHORT).show();
+                    Log.i("noduritoto ap", "apList to String :" + listString);
+                    webViewForTableSearch.loadUrl("javascript:setlocation('" + listString + "')");
+
                 }
                 wm.startScan();
 
@@ -209,6 +212,7 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
     @OnClick(R.id.pathForTableButton)
     public void onTableNumButtonClick(){
         tablePresenter.tryFindTable(this);
+        webViewForTableSearch.loadUrl("javascript:setseat('" + tableNumEditText.getText().toString() + "')");
         //tableNumEditText.getText().toString();
     }
 }
