@@ -212,6 +212,7 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
     @OnClick(R.id.pathForTableButton)
     public void onTableNumButtonClick(){
         tablePresenter.tryFindTable(this);
+        checkTableNum(new Integer(tableNumEditText.getText().toString()));
         webViewForTableSearch.loadUrl("javascript:setseat('" + tableNumEditText.getText().toString() + "')");
         //tableNumEditText.getText().toString();
     }
