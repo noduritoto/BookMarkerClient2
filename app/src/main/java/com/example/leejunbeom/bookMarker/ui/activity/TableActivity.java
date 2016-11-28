@@ -95,7 +95,7 @@ public class TableActivity extends AppCompatActivity implements TableScreen {
         apInfo = new APInfo(getResources());
         this.MAClist = apInfo.getMAClist();
         wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if(!wm.isWifiEnabled()) wm.setWifiEnabled(true);
+        //if(!wm.isWifiEnabled()) wm.setWifiEnabled(true);
 
         tryFindTable();
 

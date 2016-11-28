@@ -67,9 +67,6 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     @Bind(R.id.searchButton)
     Button searchButton;
 
-    @Bind(R.id.pathButton)
-    Button pathButton;
-
     @Inject
     NaviPresenter naviPresenter;
 
@@ -82,8 +79,6 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
     @Bind(R.id.webViewForBookFind)
     WebView webViewForBookFind;
 
-    @Bind(R.id.urlEditTextInNavi)
-    EditText urlEditTextInNavi;
 
     private boolean mapDraw = true;
     private Bitmap libraryViewBitMap;
@@ -152,11 +147,6 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         //mapDraw = true;
 
         if(mapDraw) {
-            //준범
-            /*
-            libraryViewBitMap = BitmapFactory.decodeResource(this.getApplicationContext().getResources(), R.drawable.non10);
-            this.libraryView.setImageBitmap(rotateImage(libraryViewBitMap,90));
-            */
 
             //영훈
             Glide.with(mActivity).load(R.drawable.non10).asBitmap().into(new SimpleTarget<Bitmap>(500, 500) {
@@ -176,7 +166,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         this.MAClist = apInfo.getMAClist();
 
         wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if(!wm.isWifiEnabled()) wm.setWifiEnabled(true);
+        //if(!wm.isWifiEnabled()) wm.setWifiEnabled(true);
         tryScan();
 
 
@@ -197,7 +187,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                 if (position == 0) {
                     libraryView.invalidate();
                     searchButton.setEnabled(false);
-                    pathButton.setEnabled(false);
+                    //pathButton.setEnabled(false);
                     //libraryView.setImageBitmap(rotateImage(computedBitMap, 90)); // 준범, 훈의 주석처리
 
                     // 자바스크립트 연동 부분 = ALL
@@ -211,7 +201,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                     //computedBitMap.recycle();
                     libraryView.invalidate();
                     searchButton.setEnabled(true);
-                    pathButton.setEnabled(true);
+                    //pathButton.setEnabled(true);
                     Log.i("noduri navi test 1. position test", Integer.toString(position) );
                     Book book=spinnerBookList.get(position);
                     int resourceId = myResources.getIdentifier(book.getBookShelf(), "drawable", myContext.getPackageName());
@@ -239,7 +229,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
                     //Bitmap bookBitMap=BitmapFactory.decodeResource(myResources, resourceId);
 
                     //자바스크립트 연동부분
-                    Toast.makeText(myContext, book.getBookShelfNumber(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(myContext, book.getBookShelfNumber(), Toast.LENGTH_SHORT).show();
                     System.out.println(book.getBookShelf());
                     webViewForBookFind.loadUrl("javascript:hideshelf()");
                     webViewForBookFind.loadUrl("javascript:showshelf('" + book.getBookShelfNumber() + "')");
@@ -261,8 +251,10 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
         naviPresenter.onBookSearchButtonClick(this);
     }
 
+    /*
     @OnClick(R.id.pathButton)
     public void onPathButton(){ naviPresenter.onPathButtonClick(this); }
+    */
 
 
     @Override
@@ -272,14 +264,15 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
         Book book=spinnerBookList.get(spinnerPosition);
         Log.i("noduri feature url test ", book.getFeatureUrl() );
-        if(book.getFeatureUrl()!=null) {
+        if(!book.getFeatureUrl().isEmpty()) {
 
             Intent intent = new Intent(this, SearchActivity.class);
             intent.putExtra("imageURL", book.getFeatureUrl());
+            //Toast.makeText(this, book.getFeatureUrl().,Toast.LENGTH_SHORT).show();
 
             startActivity(intent);
         }else{
-            Toast.makeText(this,"책 이미지 등록이 안되있습니다",Toast.LENGTH_SHORT);
+            Toast.makeText(this,"책 이미지 등록이 안되있습니다",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -288,8 +281,6 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
         Intent intent = new Intent(this, PathActivity.class);
         startActivity(intent);
-
-        //webViewForBookFind.loadUrl("http://" + urlEditTextInNavi.getText().toString() + "/");
     }
 
     @Override
@@ -362,6 +353,7 @@ public class NaviActivity extends AppCompatActivity implements NaviScreen{
 
         Book computedBook = new Book();
         computedBook.setMark("All");
+        computedBook.setTitle("All");
         spinnerBookList = new ArrayList<Book>(bookArrayList);
         spinnerBookList.add(0, computedBook);
         //spinnerBookList.addAll(1,bookArrayList);

@@ -74,7 +74,8 @@ public class SpinnerAdapter_impl extends BaseAdapter {
 
         BookHolder holder = (BookHolder) convertView.getTag();
         Book book = getItem(position);
-        holder.book_name.setText(book.getMark());
+        //holder.book_name.setText(book.getMark());
+        holder.book_name.setText(book.getTitle());
         return convertView;
     }
 

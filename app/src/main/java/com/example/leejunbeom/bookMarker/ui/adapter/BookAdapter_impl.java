@@ -70,7 +70,8 @@ public class BookAdapter_impl extends BaseAdapter {
 
         BookHolder holder = (BookHolder) convertView.getTag();
         Book book = getItem(position);
-        holder.book_name.setText(book.getMark());
+        //holder.book_name.setText(book.getMark()); 준
+        holder.book_name.setText(book.getTitle());
         return convertView;
     }
 
