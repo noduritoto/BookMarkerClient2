@@ -1,9 +1,16 @@
 package com.example.leejunbeom.bookMarker.ui.activity;
 
 
+import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -62,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements Mainscreen{
 
     Context mainContext;
 
+    // permission request num
+    private final int MY_PERMISSIONS_REQUEST = 100;
+
+
     // private GoogleApiClient client;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements Mainscreen{
         //SwipeMenuListView listView;
         //listView.setMenuCreator();
         ((AppApplication) getApplication()).component().inject(this);
+
+        permissionCheck();
+        checkGPS();
 
         bAdapter = new BookAdapter_impl(this.getApplicationContext());
         listView.setAdapter(bAdapter);
@@ -195,6 +209,125 @@ public class MainActivity extends AppCompatActivity implements Mainscreen{
     // test
     public Button getAddButton() {
         return bookAddButton;
+    }
+
+    //권한얻기
+    public void permissionCheck(){
+        //위치
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST);
+        }
+
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    MY_PERMISSIONS_REQUEST);
+        }
+
+        //저장공간
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST);
+        }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST);
+        }
+
+        //카메라
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_REQUEST);
+        }
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    permissionCheck();
+
+                } else {
+
+                    //Toast.makeText(this, "permission problem", Toast.LENGTH_SHORT).show();
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    //GPS
+    public void checkGPS(){
+        String context = Context.LOCATION_SERVICE;
+        LocationManager locationManager = (LocationManager)getSystemService(context);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            alertCheckGPS();
+        }
+    }
+
+    private void alertCheckGPS() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("사용자의 현위치를 표시하기 위해 위치 기능이 활성화 되어야 합니다.")
+                .setCancelable(false)
+                .setPositiveButton("위치 설정",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                moveConfigGPS();
+                            }
+                        })
+                .setNegativeButton("취소",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                                Toast.makeText(mainContext, "위치 기능(GPS)을 활성화 해야합니다.", Toast.LENGTH_LONG).show();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    // GPS 설정화면으로 이동
+    private void moveConfigGPS() {
+        Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(gpsOptionsIntent);
     }
 }
 
